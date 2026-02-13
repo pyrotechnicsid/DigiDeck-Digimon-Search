@@ -6,53 +6,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Arima+Madurai:wght@900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.js"
-        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
     <script defer src="app.js"></script>
-    <title>DigiDeck</title>
+    <title>DigiDeck - Digimon Database</title>
 </head>
 
 <body>
     <div id="main">
-        <div id="header">
+        <header id="header">
+            <img src="images/logo.png" alt="DigiDeck Logo" width="500" height="300">
+        </header>
+
+        <h1>DigiDeck Digimon Database</h1>
+
+        <div id="search-section">
+            <input type="text" id="searchInput" placeholder="Search Digimon or Cards..." aria-label="Search input">
+            <button id="searchBtn">Search</button>
         </div>
-         <h1>DigiDeck Digimon Database</h1>
-        <div id="user-section">
-            <h3>Search Digimon by Name:</h3>
-            <input type="text" name='search'>
-            <button id="submit">Search</button>
+
+        <nav class="tabs" role="tablist" aria-label="Search Categories">
+            <button class="tab-btn active" data-tab="digimon" role="tab" aria-selected="true" aria-controls="digimon-panel">
+                Digimon
+            </button>
+            <button class="tab-btn" data-tab="cards" role="tab" aria-selected="false" aria-controls="cards-panel">
+                TCG Cards
+            </button>
+        </nav>
+
+        <div id="tab-content">
+            <div id="digimon-panel" class="tab-panel active" role="tabpanel" aria-labelledby="digimon-tab">
+                <div class="filter-section">
+                    <label for="levelFilter">Filter by Stage:</label>
+                    <select id="levelFilter" aria-label="Stage filter">
+                        <option value="">All Stages</option>
+                        <option value="Fresh">Fresh</option>
+                        <option value="Training">Training</option>
+                        <option value="Rookie">Rookie</option>
+                        <option value="Champion">Champion</option>
+                        <option value="Ultimate">Ultimate</option>
+                        <option value="Mega">Mega</option>
+                    </select>
+                </div>
+                <div id="digimon-results" class="results-container"></div>
+            </div>
+
+            <div id="cards-panel" class="tab-panel" role="tabpanel" aria-labelledby="cards-tab">
+                <div class="filter-section">
+                    <label for="typeFilter">Card Type:</label>
+                    <select id="typeFilter" aria-label="Card type filter">
+                        <option value="Digimon">Digimon</option>
+                        <option value="Option">Option</option>
+                        <option value="Tamer">Tamer</option>
+                        <option value="Digi-Egg">Digi-Egg</option>
+                    </select>
+                </div>
+                <div id="cards-results" class="results-container"></div>
+            </div>
         </div>
-        <div id="user-section2">
-            <h3>Search Digimons by stage:</h3>
-            <label for="Digilevels">Choose a stage:</label>
-            <select name="levels" id="levelSelect">
-                <option value="Fresh">Fresh</option>
-                <option value="Training">Training</option>
-                <option value="Rookie">Rookie</option>
-                <option value="Champion">Champion</option>
-                <option value="Ultimate">Ultimate</option>
-                <option value="Mega">Mega</option>
-            </select>
-            <input type="submit" id="levelSubmit" value="Search">
+
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p>Searching...</p>
         </div>
-        <div id="user-section3">
-            <h3>Search Digimon TCG:</h3>
-            <input type="text" name='search'>
-            <label for="Digitypes"></label>
-            <select name="type" id="typeSelect">
-                <option value="Digimon">Digimon</option>
-                <option value="Option">Option</option>
-                <option value="Tamer">Tamer</option>
-                <option value="Digi-Egg">Digi-Egg</option>
-            </select>
-            <br> </br>
-            <button id="TCGSubmit">Search</button>
-        </div>
-        <div id="results">
-        </div>
+
+        <div id="error-message" class="hidden"></div>
     </div>
-    <div id="footer">Created by Siddhant Bose ©2022
-    </div>
+
+    <footer id="footer">
+        Created by Siddhant Bose ©2022-2026
+    </footer>
 </body>
 
 </html>
