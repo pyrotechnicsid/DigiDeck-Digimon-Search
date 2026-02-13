@@ -253,17 +253,39 @@ function createTCGCard(cardData, index) {
 
   const cardNumber = document.createElement('span');
   cardNumber.className = 'card-number';
-  cardNumber.textContent = `#${cardData.cardnumber}`;
-
-  const img = document.createElement('img');
-  img.className = 'card-image2';
-  img.src = cardData.image_url;
-  img.alt = cardData.name;
-  img.loading = 'lazy';
+  // Updated field name: cardnumber → id
+  cardNumber.textContent = `#${cardData.id || cardData.cardnumber || 'N/A'}`;
 
   card.appendChild(title);
   card.appendChild(cardNumber);
-  card.appendChild(img);
+
+  // Construct image URL from card ID
+  // Pattern: https://images.digimoncard.io/images/cards/{id}.webp
+  if (cardData.id) {
+    const imageUrl = `https://images.digimoncard.io/images/cards/${cardData.id}.webp`;
+    const img = document.createElement('img');
+    img.className = 'card-image2';
+    img.src = imageUrl;
+    img.alt = cardData.name;
+    img.loading = 'lazy';
+
+    // Add error handler for broken images
+    img.onerror = function() {
+      this.style.display = 'none';
+      const noImage = document.createElement('p');
+      noImage.textContent = '(Image not available)';
+      noImage.style.color = 'rgba(255, 255, 255, 0.5)';
+      this.parentElement.appendChild(noImage);
+    };
+
+    card.appendChild(img);
+  } else {
+    // No card ID available
+    const noImage = document.createElement('p');
+    noImage.textContent = '(No image available)';
+    noImage.style.color = 'rgba(255, 255, 255, 0.5)';
+    card.appendChild(noImage);
+  }
 
   // Stage (if available)
   if (cardData.stage) {
@@ -289,15 +311,18 @@ function createTCGCard(cardData, index) {
     card.appendChild(color);
   }
 
-  // Effects
-  if (cardData.maineffect || cardData.soureeffect) {
+  // Effects - Updated field names: maineffect → main_effect, soureeffect → source_effect
+  if (cardData.main_effect || cardData.source_effect || cardData.maineffect || cardData.soureeffect) {
     const effect = document.createElement('div');
     effect.className = 'card-effect';
 
-    if (cardData.maineffect) {
-      effect.innerHTML = `<strong>Main Effect:</strong> ${cardData.maineffect}`;
-    } else if (cardData.soureeffect) {
-      effect.innerHTML = `<strong>Inherited/Security Effect:</strong> ${cardData.soureeffect}`;
+    const mainEffect = cardData.main_effect || cardData.maineffect;
+    const sourceEffect = cardData.source_effect || cardData.soureeffect;
+
+    if (mainEffect) {
+      effect.innerHTML = `<strong>Main Effect:</strong> ${mainEffect}`;
+    } else if (sourceEffect) {
+      effect.innerHTML = `<strong>Inherited/Security Effect:</strong> ${sourceEffect}`;
     }
 
     card.appendChild(effect);
