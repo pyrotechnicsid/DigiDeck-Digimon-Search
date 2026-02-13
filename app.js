@@ -93,7 +93,7 @@ const DigimonAPI = {
 };
 
 const TCGCardAPI = {
-  baseURL: 'https://digimoncard.io/api-public/search.php',
+  baseURL: 'https://digimoncard.io/api-public/search',
 
   async search(name, type) {
     const params = new URLSearchParams({
