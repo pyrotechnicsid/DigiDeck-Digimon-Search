@@ -260,23 +260,34 @@ function createTCGCard(cardData, index) {
   card.appendChild(cardNumber);
 
   // Construct image URL from card ID
-  // Pattern: https://images.digimoncard.io/images/cards/{id}.webp
+  // Try multiple formats to get best quality: JPG > PNG > WebP
   if (cardData.id) {
-    const imageUrl = `https://images.digimoncard.io/images/cards/${cardData.id}.webp`;
     const img = document.createElement('img');
     img.className = 'card-image2';
-    img.src = imageUrl;
     img.alt = cardData.name;
     img.loading = 'lazy';
 
-    // Add error handler for broken images
-    img.onerror = function() {
-      this.style.display = 'none';
-      const noImage = document.createElement('p');
-      noImage.textContent = '(Image not available)';
-      noImage.style.color = 'rgba(255, 255, 255, 0.5)';
-      this.parentElement.appendChild(noImage);
+    // Try JPG first (potentially higher quality), fallback to PNG, then WebP
+    const imageFormats = ['jpg', 'png', 'webp'];
+    let formatIndex = 0;
+
+    const tryNextFormat = () => {
+      if (formatIndex < imageFormats.length) {
+        const format = imageFormats[formatIndex];
+        img.src = `https://images.digimoncard.io/images/cards/${cardData.id}.${format}`;
+        formatIndex++;
+      } else {
+        // All formats failed
+        img.style.display = 'none';
+        const noImage = document.createElement('p');
+        noImage.textContent = '(Image not available)';
+        noImage.style.color = 'rgba(255, 255, 255, 0.5)';
+        img.parentElement.appendChild(noImage);
+      }
     };
+
+    img.onerror = tryNextFormat;
+    tryNextFormat(); // Start with first format
 
     card.appendChild(img);
   } else {
@@ -409,6 +420,65 @@ function initializeEventListeners() {
 }
 
 // ========================================
+// IMAGE ZOOM/LIGHTBOX FUNCTIONALITY
+// ========================================
+function initializeImageZoom() {
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  const closeBtn = modal.querySelector('.close-btn');
+
+  // Function to open modal with image
+  window.openImageModal = function(imageSrc, imageAlt) {
+    modalImage.src = imageSrc;
+    modalImage.alt = imageAlt || 'Zoomed card image';
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+  };
+
+  // Function to close modal
+  function closeModal() {
+    modal.classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+  }
+
+  // Close on close button click
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeModal();
+  });
+
+  // Close when clicking on background (not on image)
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+      closeModal();
+    }
+  });
+}
+
+// Add click listener to card images (delegated)
+function addImageClickListeners() {
+  // Use event delegation on results containers
+  document.getElementById('digimon-results').addEventListener('click', (e) => {
+    if (e.target.classList.contains('card-image')) {
+      openImageModal(e.target.src, e.target.alt);
+    }
+  });
+
+  document.getElementById('cards-results').addEventListener('click', (e) => {
+    if (e.target.classList.contains('card-image2')) {
+      openImageModal(e.target.src, e.target.alt);
+    }
+  });
+}
+
+// ========================================
 // INITIALIZATION
 // ========================================
 function initializeApp() {
@@ -416,6 +486,10 @@ function initializeApp() {
 
   // Initialize event listeners
   initializeEventListeners();
+
+  // Initialize image zoom functionality
+  initializeImageZoom();
+  addImageClickListeners();
 
   // Set initial tab
   switchTab('digimon');
